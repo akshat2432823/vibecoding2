@@ -1,0 +1,224 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Cognizant Corporate Theme */
+:root {
+  --cognizant-blue: #0066cc;
+  --cognizant-dark-blue: #004080;
+  --cognizant-light-blue: #e6f2ff;
+  --cognizant-accent: #0052a3;
+  --cognizant-gray: #f8f9fa;
+  --cognizant-text: #333333;
+  --cognizant-border: #e0e6ed;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--cognizant-gray);
+  color: var(--cognizant-text);
+}
+
+/* Custom Cognizant Components */
+.cognizant-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200;
+}
+
+.cognizant-button-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200;
+  background-color: var(--cognizant-blue);
+}
+
+.cognizant-button-primary:hover {
+  background-color: var(--cognizant-dark-blue);
+}
+
+.cognizant-button-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors duration-200;
+}
+
+.cognizant-input {
+  @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition-colors duration-200;
+}
+
+.cognizant-input:focus {
+  --tw-ring-color: var(--cognizant-blue);
+  border-color: var(--cognizant-blue);
+}
+
+.cognizant-sidebar {
+  background: linear-gradient(180deg, var(--cognizant-blue) 0%, var(--cognizant-dark-blue) 100%);
+}
+
+.cognizant-header {
+  @apply bg-white border-b border-gray-200 shadow-sm;
+}
+
+.cognizant-status-badge {
+  @apply px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+/* Status specific colors aligned with corporate theme */
+.status-idle {
+  @apply bg-gray-100 text-gray-700;
+}
+
+.status-training {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-onboarded {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.status-billing-planned {
+  @apply bg-purple-100 text-purple-800;
+}
+
+.status-billing-started {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-regularized {
+  @apply bg-emerald-100 text-emerald-800;
+}
+
+.status-feedback-poor {
+  @apply bg-red-100 text-red-800;
+}
+
+.status-released {
+  @apply bg-gray-100 text-gray-600;
+}
+
+/* Corporate table styling */
+.cognizant-table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.cognizant-table thead {
+  background-color: var(--cognizant-light-blue);
+}
+
+.cognizant-table-th {
+  @apply px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider;
+}
+
+.cognizant-table-td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+}
+
+.cognizant-table tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+/* Dashboard metrics styling */
+.metric-card {
+  @apply bg-white p-6 rounded-lg shadow-sm border border-gray-200;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.metric-icon-blue {
+  background-color: var(--cognizant-light-blue);
+  color: var(--cognizant-blue);
+}
+
+.metric-icon-green {
+  @apply bg-green-50;
+  color: #059669;
+}
+
+.metric-icon-purple {
+  @apply bg-purple-50;
+  color: #7c3aed;
+}
+
+.metric-icon-orange {
+  @apply bg-orange-50;
+  color: #ea580c;
+}
+
+/* Professional form styling */
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-input {
+  @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition-colors duration-200;
+  border-color: var(--cognizant-border);
+}
+
+.form-input:focus {
+  --tw-ring-color: var(--cognizant-blue);
+  border-color: var(--cognizant-blue);
+}
+
+.form-select {
+  @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition-colors duration-200 bg-white;
+  border-color: var(--cognizant-border);
+}
+
+.form-select:focus {
+  --tw-ring-color: var(--cognizant-blue);
+  border-color: var(--cognizant-blue);
+}
+
+/* Professional modal styling */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl;
+  border: 1px solid var(--cognizant-border);
+}
+
+/* Loading animations */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Corporate navigation */
+.nav-item {
+  @apply flex items-center px-4 py-3 text-white hover:bg-white hover:bg-opacity-10 rounded-md transition-colors duration-200;
+}
+
+.nav-item.active {
+  @apply bg-white bg-opacity-20;
+}
+
+/* Professional spacing */
+.content-container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.page-header {
+  @apply mb-8 pb-4 border-b border-gray-200;
+}
+
+.page-title {
+  @apply text-3xl font-bold text-gray-900;
+}
+
+.page-subtitle {
+  @apply mt-2 text-gray-600;
+} 
