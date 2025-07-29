@@ -67,21 +67,21 @@ export default function Dashboard() {
       description: 'Register a new trainee employee',
       icon: Users,
       onClick: () => navigate('/gencs'),
-      color: 'border-blue-300 hover:border-blue-400 hover:bg-blue-50'
+      color: 'bg-blue-100 hover:bg-blue-200'
     },
     {
       title: 'Add Mentor',
       description: 'Register a new mentor',
       icon: UserCheck,
       onClick: () => navigate('/mentors'),
-      color: 'border-green-300 hover:border-green-400 hover:bg-green-50'
+      color: 'bg-green-100 hover:bg-green-200'
     },
     {
       title: 'Add Feedback',
       description: 'Submit feedback for a GenC',
       icon: MessageSquare,
       onClick: () => navigate('/feedbacks'),
-      color: 'border-purple-300 hover:border-purple-400 hover:bg-purple-50'
+      color: 'bg-purple-100 hover:bg-purple-200'
     }
   ];
 
@@ -133,7 +133,7 @@ export default function Dashboard() {
                   <button
                     key={action.title}
                     onClick={action.onClick}
-                    className={`w-full p-4 border-2 border-dashed rounded-lg transition-all duration-200 ${action.color} group`}
+                    className={`w-full p-4 rounded-lg transition-all duration-200 ${action.color} group`}
                   >
                     <div className="flex items-center">
                       <Icon className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
