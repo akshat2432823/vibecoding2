@@ -3,6 +3,9 @@ from sqlalchemy import and_
 from typing import List, Optional
 import models
 import schemas
+import pandas as pd
+import io
+from fastapi import UploadFile
 
 # Status transition rules for GenC
 ALLOWED_STATUS_TRANSITIONS = {
@@ -73,6 +76,405 @@ def delete_account(db: Session, account_id: int):
         db.delete(db_account)
         db.commit()
     return db_account
+
+async def import_accounts_from_excel(db: Session, file: UploadFile):
+    """Import accounts from Excel file"""
+    try:
+        # Read the uploaded file content
+        contents = await file.read()
+        
+        # Load the Excel file into a pandas DataFrame
+        df = pd.read_excel(io.BytesIO(contents))
+        
+        # Define expected columns
+        expected_columns = ['account_name', 'epl_name', 'edp_name']
+        
+        # Check if all required columns are present
+        missing_columns = [col for col in expected_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
+        
+        # Clean the data
+        df = df.dropna(subset=expected_columns)  # Remove rows with missing required data
+        df = df[expected_columns]  # Keep only required columns
+        
+        # Track import results
+        imported_count = 0
+        skipped_count = 0
+        errors = []
+        
+        # Process each row
+        for index, row in df.iterrows():
+            try:
+                # Check if account already exists
+                existing_account = get_account_by_name(db, row['account_name'])
+                if existing_account:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Account '{row['account_name']}' already exists")
+                    continue
+                
+                # Create account data
+                account_data = schemas.AccountCreate(
+                    account_name=str(row['account_name']).strip(),
+                    epl_name=str(row['epl_name']).strip(),
+                    edp_name=str(row['edp_name']).strip()
+                )
+                
+                # Create the account
+                create_account(db, account_data)
+                imported_count += 1
+                
+            except Exception as e:
+                skipped_count += 1
+                errors.append(f"Row {index + 2}: {str(e)}")
+        
+        return {
+            "message": "Import completed",
+            "total_rows": len(df),
+            "imported": imported_count,
+            "skipped": skipped_count,
+            "errors": errors[:10] if errors else []  # Limit errors to first 10
+        }
+        
+    except Exception as e:
+        raise ValueError(f"Failed to process Excel file: {str(e)}")
+
+async def import_mentors_from_excel(db: Session, file: UploadFile):
+    """Import mentors from Excel file"""
+    try:
+        # Read the uploaded file content
+        contents = await file.read()
+        
+        # Load the Excel file into a pandas DataFrame
+        df = pd.read_excel(io.BytesIO(contents))
+        
+        # Define expected columns
+        expected_columns = ['associate_id', 'mentor_name', 'designation', 'service_line']
+        
+        # Check if all required columns are present
+        missing_columns = [col for col in expected_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
+        
+        # Clean the data
+        df = df.dropna(subset=expected_columns)  # Remove rows with missing required data
+        df = df[expected_columns]  # Keep only required columns
+        
+        # Track import results
+        imported_count = 0
+        skipped_count = 0
+        errors = []
+        
+        # Process each row
+        for index, row in df.iterrows():
+            try:
+                # Check if mentor already exists
+                existing_mentor = get_mentor_by_associate_id(db, row['associate_id'])
+                if existing_mentor:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Mentor '{row['associate_id']}' already exists")
+                    continue
+                
+                # Validate designation
+                try:
+                    designation = models.MentorDesignationEnum(row['designation'])
+                except ValueError:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Invalid designation '{row['designation']}'. Valid values: D, AD, SM, M, SA, A")
+                    continue
+                
+                # Create mentor data
+                mentor_data = schemas.MentorCreate(
+                    associate_id=str(row['associate_id']).strip(),
+                    mentor_name=str(row['mentor_name']).strip(),
+                    designation=designation,
+                    service_line=str(row['service_line']).strip()
+                )
+                
+                # Create the mentor
+                create_mentor(db, mentor_data)
+                imported_count += 1
+                
+            except Exception as e:
+                skipped_count += 1
+                errors.append(f"Row {index + 2}: {str(e)}")
+        
+        return {
+            "message": "Import completed",
+            "total_rows": len(df),
+            "imported": imported_count,
+            "skipped": skipped_count,
+            "errors": errors[:10] if errors else []  # Limit errors to first 10
+        }
+        
+    except Exception as e:
+        raise ValueError(f"Failed to process Excel file: {str(e)}")
+
+async def import_account_service_lines_from_excel(db: Session, file: UploadFile):
+    """Import account service lines from Excel file"""
+    try:
+        # Read the uploaded file content
+        contents = await file.read()
+        
+        # Load the Excel file into a pandas DataFrame
+        df = pd.read_excel(io.BytesIO(contents))
+        
+        # Define expected columns
+        expected_columns = ['account_name', 'service_line', 'edl_name', 'pdl_name', 'sl_spoc']
+        
+        # Check if all required columns are present
+        missing_columns = [col for col in expected_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
+        
+        # Clean the data
+        df = df.dropna(subset=expected_columns)  # Remove rows with missing required data
+        df = df[expected_columns]  # Keep only required columns
+        
+        # Track import results
+        imported_count = 0
+        skipped_count = 0
+        errors = []
+        
+        # Process each row
+        for index, row in df.iterrows():
+            try:
+                # Find account by name
+                account = get_account_by_name(db, row['account_name'])
+                if not account:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Account '{row['account_name']}' not found")
+                    continue
+                
+                # Create service line data
+                service_line_data = schemas.AccountServiceLineCreate(
+                    account_id=account.id,
+                    service_line=str(row['service_line']).strip(),
+                    edl_name=str(row['edl_name']).strip(),
+                    pdl_name=str(row['pdl_name']).strip(),
+                    sl_spoc=str(row['sl_spoc']).strip()
+                )
+                
+                # Create the service line
+                create_account_service_line(db, service_line_data)
+                imported_count += 1
+                
+            except Exception as e:
+                skipped_count += 1
+                errors.append(f"Row {index + 2}: {str(e)}")
+        
+        return {
+            "message": "Import completed",
+            "total_rows": len(df),
+            "imported": imported_count,
+            "skipped": skipped_count,
+            "errors": errors[:10] if errors else []  # Limit errors to first 10
+        }
+        
+    except Exception as e:
+        raise ValueError(f"Failed to process Excel file: {str(e)}")
+
+async def import_gencs_from_excel(db: Session, file: UploadFile):
+    """Import GenCs from Excel file"""
+    try:
+        # Read the uploaded file content
+        contents = await file.read()
+        
+        # Load the Excel file into a pandas DataFrame
+        df = pd.read_excel(io.BytesIO(contents))
+        
+        # Define expected columns
+        expected_columns = ['associate_id', 'genc_name', 'account_name', 'service_line', 'mentor_associate_id', 
+                          'status', 'date_of_joining', 'location', 'current_designation']
+        
+        # Check if all required columns are present
+        missing_columns = [col for col in expected_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
+        
+        # Clean the data - only check required columns for NaN
+        required_cols = ['associate_id', 'genc_name', 'account_name', 'service_line', 'mentor_associate_id', 
+                        'status', 'date_of_joining', 'location', 'current_designation']
+        df = df.dropna(subset=required_cols)
+        
+        # Track import results
+        imported_count = 0
+        skipped_count = 0
+        errors = []
+        
+        # Process each row
+        for index, row in df.iterrows():
+            try:
+                # Check if GenC already exists
+                existing_genc = get_genc_by_associate_id(db, row['associate_id'])
+                if existing_genc:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: GenC '{row['associate_id']}' already exists")
+                    continue
+                
+                # Find account by name
+                account = get_account_by_name(db, row['account_name'])
+                if not account:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Account '{row['account_name']}' not found")
+                    continue
+                
+                # Find service line by account and service line name
+                service_line = db.query(models.AccountServiceLine).filter(
+                    models.AccountServiceLine.account_id == account.id,
+                    models.AccountServiceLine.service_line == row['service_line']
+                ).first()
+                if not service_line:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Service line '{row['service_line']}' not found for account '{row['account_name']}'")
+                    continue
+                
+                # Find mentor by associate ID
+                mentor = get_mentor_by_associate_id(db, row['mentor_associate_id'])
+                if not mentor:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Mentor '{row['mentor_associate_id']}' not found")
+                    continue
+                
+                # Validate enums
+                try:
+                    status = models.StatusEnum(row['status'])
+                except ValueError:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Invalid status '{row['status']}'")
+                    continue
+                
+                try:
+                    location = models.LocationEnum(row['location'])
+                except ValueError:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Invalid location '{row['location']}'")
+                    continue
+                
+                try:
+                    designation = models.DesignationEnum(row['current_designation'])
+                except ValueError:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Invalid designation '{row['current_designation']}'")
+                    continue
+                
+                # Parse date
+                try:
+                    if isinstance(row['date_of_joining'], str):
+                        from datetime import datetime
+                        date_of_joining = datetime.strptime(row['date_of_joining'], '%Y-%m-%d').date()
+                    else:
+                        date_of_joining = row['date_of_joining'].date() if hasattr(row['date_of_joining'], 'date') else row['date_of_joining']
+                except ValueError:
+                    skipped_count += 1
+                    errors.append(f"Row {index + 2}: Invalid date format for date_of_joining. Use YYYY-MM-DD format")
+                    continue
+                
+                # Create GenC data
+                genc_data = schemas.GenCCreate(
+                    associate_id=str(row['associate_id']).strip(),
+                    genc_name=str(row['genc_name']).strip(),
+                    account_id=account.id,
+                    service_line_id=service_line.id,
+                    mentor_id=mentor.id,
+                    status=status,
+                    date_of_joining=date_of_joining,
+                    location=location,
+                    current_designation=designation,
+                    # Optional fields
+                    date_of_allocation=None,
+                    allocation_project=None,
+                    team_name=None,
+                    planned_billing_start_date=None,
+                    actual_billing_start_date=None
+                )
+                
+                # Create the GenC
+                create_genc(db, genc_data)
+                imported_count += 1
+                
+            except Exception as e:
+                skipped_count += 1
+                errors.append(f"Row {index + 2}: {str(e)}")
+        
+        return {
+            "message": "Import completed",
+            "total_rows": len(df),
+            "imported": imported_count,
+            "skipped": skipped_count,
+            "errors": errors[:10] if errors else []  # Limit errors to first 10
+        }
+        
+    except Exception as e:
+        raise ValueError(f"Failed to process Excel file: {str(e)}")
+
+def delete_all_accounts_and_related_data(db: Session):
+    """Delete all accounts and their related data in the correct order"""
+    try:
+        # Get counts before deletion for reporting
+        gencs_count = db.query(models.GenC).count()
+        genc_skills_count = db.query(models.GenCSkill).count()
+        genc_feedbacks_count = db.query(models.GenCFeedback).count()
+        service_lines_count = db.query(models.AccountServiceLine).count()
+        accounts_count = db.query(models.Account).count()
+        
+        # Delete in order to respect foreign key constraints
+        # 1. Delete GenC Skills (depends on GenC)
+        db.query(models.GenCSkill).filter(
+            models.GenCSkill.genc_id.in_(
+                db.query(models.GenC.id).filter(
+                    models.GenC.account_id.in_(
+                        db.query(models.Account.id)
+                    )
+                )
+            )
+        ).delete(synchronize_session=False)
+        
+        # 2. Delete GenC Feedback (depends on GenC)
+        db.query(models.GenCFeedback).filter(
+            models.GenCFeedback.genc_id.in_(
+                db.query(models.GenC.id).filter(
+                    models.GenC.account_id.in_(
+                        db.query(models.Account.id)
+                    )
+                )
+            )
+        ).delete(synchronize_session=False)
+        
+        # 3. Delete GenCs (depends on Account and AccountServiceLine)
+        db.query(models.GenC).filter(
+            models.GenC.account_id.in_(
+                db.query(models.Account.id)
+            )
+        ).delete(synchronize_session=False)
+        
+        # 4. Delete Account Service Lines (depends on Account)
+        db.query(models.AccountServiceLine).filter(
+            models.AccountServiceLine.account_id.in_(
+                db.query(models.Account.id)
+            )
+        ).delete(synchronize_session=False)
+        
+        # 5. Delete Accounts
+        db.query(models.Account).delete(synchronize_session=False)
+        
+        # Commit all deletions
+        db.commit()
+        
+        return {
+            "message": "All accounts and related data deleted successfully",
+            "deleted_counts": {
+                "genc_skills": genc_skills_count,
+                "genc_feedbacks": genc_feedbacks_count,
+                "gencs": gencs_count,
+                "account_service_lines": service_lines_count,
+                "accounts": accounts_count
+            }
+        }
+        
+    except Exception as e:
+        db.rollback()
+        raise ValueError(f"Failed to delete accounts and related data: {str(e)}")
 
 # Account Service Line CRUD
 def get_account_service_line(db: Session, service_line_id: int):

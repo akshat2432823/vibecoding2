@@ -91,6 +91,10 @@ def create_test_data():
             {"account_name": "Google Cloud", "epl_name": "James Rodriguez", "edp_name": "Amanda White"},
             {"account_name": "Citibank", "epl_name": "Maria Garcia", "edp_name": "Christopher Lee"},
             {"account_name": "Wells Fargo", "epl_name": "Kevin Brown", "edp_name": "Jessica Martinez"},
+            {"account_name": "IBM Corporation", "epl_name": "Rachel Kim", "edp_name": "Daniel Thompson"},
+            {"account_name": "Oracle Systems", "epl_name": "Steven Clark", "edp_name": "Michelle Adams"},
+            {"account_name": "SAP Solutions", "epl_name": "Jennifer Wang", "edp_name": "Thomas Miller"},
+            {"account_name": "Salesforce Inc", "epl_name": "Brian Cooper", "edp_name": "Laura Jones"},
         ]
         
         created_accounts = []
@@ -125,6 +129,9 @@ def create_test_data():
             
             # Wells Fargo
             {"account_id": 6, "service_line": "Wealth Management", "edl_name": "Rakesh Tiwari", "pdl_name": "Swati Bansal", "sl_spoc": "Varun Goel"},
+            
+            # IBM Corporation
+            {"account_id": 7, "service_line": "AI Solutions", "edl_name": "Arjun Nair", "pdl_name": "Kavita Singh", "sl_spoc": "Ravi Kumar"},
         ]
         
         created_service_lines = []
@@ -147,6 +154,8 @@ def create_test_data():
             {"associate_id": "M006", "mentor_name": "Natasha Iyer", "designation": models.MentorDesignationEnum.SA, "service_line": "Search & Analytics"},
             {"associate_id": "M007", "mentor_name": "Rohit Gupta", "designation": models.MentorDesignationEnum.M, "service_line": "Retail Banking"},
             {"associate_id": "M008", "mentor_name": "Kavya Nair", "designation": models.MentorDesignationEnum.SM, "service_line": "Wealth Management"},
+            {"associate_id": "M009", "mentor_name": "Sanjay Kumar", "designation": models.MentorDesignationEnum.M, "service_line": "AI Solutions"},
+            {"associate_id": "M010", "mentor_name": "Meera Pillai", "designation": models.MentorDesignationEnum.SA, "service_line": "Cloud Solutions"},
         ]
         
         created_mentors = []
@@ -258,6 +267,22 @@ def create_test_data():
                 "team_name": "Financial Analytics", "location": models.LocationEnum.KOLKATA,
                 "current_designation": models.DesignationEnum.PA,
                 "planned_billing_start_date": date(2024, 4, 10)
+            },
+            {
+                "associate_id": "G009", "genc_name": "Karthik Mohan", "account_id": 7, "service_line_id": 10, "mentor_id": 9,
+                "status": models.StatusEnum.UNDER_PROJECT_TRAINING, "date_of_joining": date(2024, 3, 5),
+                "date_of_allocation": date(2024, 3, 20), "allocation_project": "AI Chatbot Development",
+                "team_name": "AI Innovation", "location": models.LocationEnum.BANGALORE,
+                "current_designation": models.DesignationEnum.PAT,
+                "planned_billing_start_date": date(2024, 5, 15)
+            },
+            {
+                "associate_id": "G010", "genc_name": "Riya Chakraborty", "account_id": 2, "service_line_id": 3, "mentor_id": 10,
+                "status": models.StatusEnum.BILLING_PLANNED, "date_of_joining": date(2024, 2, 28),
+                "date_of_allocation": date(2024, 3, 15), "allocation_project": "Cloud Migration Phase 2",
+                "team_name": "Cloud Warriors", "location": models.LocationEnum.HYDERABAD,
+                "current_designation": models.DesignationEnum.PA,
+                "planned_billing_start_date": date(2024, 4, 30)
             }
         ]
         
@@ -338,6 +363,21 @@ def create_test_data():
             {"genc_id": 8, "skill_id": 19, "proficiency_level": models.ProficiencyLevelEnum.EXPERT, "date_acquired": date(2024, 2, 25), "notes": "Data analysis specialist"},
             {"genc_id": 8, "skill_id": 22, "proficiency_level": models.ProficiencyLevelEnum.ADVANCED, "date_acquired": date(2024, 1, 30)},
             {"genc_id": 8, "skill_id": 30, "proficiency_level": models.ProficiencyLevelEnum.ADVANCED, "date_acquired": date(2024, 2, 20)},
+            
+            # Karthik Mohan (G009) - PAT with AI focus
+            {"genc_id": 9, "skill_id": 1, "proficiency_level": models.ProficiencyLevelEnum.INTERMEDIATE, "date_acquired": date(2024, 3, 10)},
+            {"genc_id": 9, "skill_id": 18, "proficiency_level": models.ProficiencyLevelEnum.BEGINNER, "date_acquired": date(2024, 3, 15), "notes": "Learning ML fundamentals"},
+            {"genc_id": 9, "skill_id": 5, "proficiency_level": models.ProficiencyLevelEnum.BEGINNER, "date_acquired": date(2024, 3, 8)},
+            {"genc_id": 9, "skill_id": 22, "proficiency_level": models.ProficiencyLevelEnum.INTERMEDIATE, "date_acquired": date(2024, 3, 5)},
+            {"genc_id": 9, "skill_id": 24, "proficiency_level": models.ProficiencyLevelEnum.ADVANCED, "date_acquired": date(2024, 3, 12)},
+            
+            # Riya Chakraborty (G010) - PA with cloud expertise
+            {"genc_id": 10, "skill_id": 1, "proficiency_level": models.ProficiencyLevelEnum.INTERMEDIATE, "date_acquired": date(2024, 3, 5)},
+            {"genc_id": 10, "skill_id": 2, "proficiency_level": models.ProficiencyLevelEnum.INTERMEDIATE, "date_acquired": date(2024, 3, 10)},
+            {"genc_id": 10, "skill_id": 5, "proficiency_level": models.ProficiencyLevelEnum.INTERMEDIATE, "date_acquired": date(2024, 3, 8)},
+            {"genc_id": 10, "skill_id": 13, "proficiency_level": models.ProficiencyLevelEnum.ADVANCED, "date_acquired": date(2024, 3, 15), "notes": "Azure certified"},
+            {"genc_id": 10, "skill_id": 15, "proficiency_level": models.ProficiencyLevelEnum.INTERMEDIATE, "date_acquired": date(2024, 3, 18)},
+            {"genc_id": 10, "skill_id": 22, "proficiency_level": models.ProficiencyLevelEnum.ADVANCED, "date_acquired": date(2024, 2, 28)},
         ]
         
         for skill_data in genc_skills_data:
@@ -381,6 +421,14 @@ def create_test_data():
             {
                 "genc_id": 8, "mentor_id": 8, "date_of_feedback": date(2024, 3, 12),
                 "feedback": "Priyanka's data analysis skills are exceptional. Her insights are valuable for the wealth management project. Communication with clients is professional."
+            },
+            {
+                "genc_id": 9, "mentor_id": 9, "date_of_feedback": date(2024, 3, 25),
+                "feedback": "Karthik shows great potential in AI and machine learning. His enthusiasm for learning new technologies is commendable. Needs more practice in production-level coding."
+            },
+            {
+                "genc_id": 10, "mentor_id": 10, "date_of_feedback": date(2024, 3, 28),
+                "feedback": "Riya demonstrates strong cloud architecture understanding. Her Azure certifications are up-to-date and she contributes well to design discussions. Ready for client engagement."
             }
         ]
         
@@ -399,6 +447,11 @@ def create_test_data():
             {"user_assoc_id": "U003", "user_name": "Rajesh Kumar", "user_type": models.UserTypeEnum.MENTOR},
             {"user_assoc_id": "U004", "user_name": "Service Line Lead", "user_type": models.UserTypeEnum.SL_MEMBER},
             {"user_assoc_id": "U005", "user_name": "Project Manager", "user_type": models.UserTypeEnum.PMO_MEMBER},
+            {"user_assoc_id": "U006", "user_name": "Priya Sharma", "user_type": models.UserTypeEnum.MENTOR},
+            {"user_assoc_id": "U007", "user_name": "Technical Lead", "user_type": models.UserTypeEnum.SL_MEMBER},
+            {"user_assoc_id": "U008", "user_name": "Delivery Manager", "user_type": models.UserTypeEnum.PMO_MEMBER},
+            {"user_assoc_id": "U009", "user_name": "Talent Acquisition", "user_type": models.UserTypeEnum.MDU_MEMBER},
+            {"user_assoc_id": "U010", "user_name": "Vikram Singh", "user_type": models.UserTypeEnum.MENTOR},
         ]
         
         for user_data in users_data:

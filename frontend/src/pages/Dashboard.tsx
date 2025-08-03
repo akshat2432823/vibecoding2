@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApiData } from '../hooks/useApi';
 import { genCAPI, mentorAPI, accountAPI, genCFeedbackAPI } from '../api';
 import { GenC, Mentor, Account, GenCFeedback } from '../types';
-import { Users, UserCheck, Building2, MessageSquare, TrendingUp, Plus } from 'lucide-react';
+import { Users, UserCheck, Building2, MessageSquare, TrendingUp, Plus, DollarSign, Clock } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -17,6 +17,8 @@ export default function Dashboard() {
   const activeMentors = mentors.length;
   const totalAccounts = accounts.length;
   const billingStartedCount = gencs.filter(genc => genc.status === 'Billing Started').length;
+  const billingPlannedCount = gencs.filter(genc => genc.status === 'Billing Planned').length;
+  const idleGenCsCount = gencs.filter(genc => genc.status === 'Idle').length;
 
   // Status breakdown
   const statusBreakdown = gencs.reduce((acc, genc) => {
@@ -36,20 +38,20 @@ export default function Dashboard() {
       description: 'Trainee employees'
     },
     {
-      title: 'Active Mentors',
-      value: activeMentors,
-      icon: UserCheck,
+      title: 'Billing Planned',
+      value: billingPlannedCount,
+      icon: DollarSign,
       color: 'text-green-600',
       bgColor: 'metric-icon-green',
-      description: 'Available mentors'
+      description: 'GenCs with billing planned'
     },
     {
-      title: 'Total Accounts',
-      value: totalAccounts,
-      icon: Building2,
+      title: 'Idle GenCs',
+      value: idleGenCsCount,
+      icon: Clock,
       color: 'text-purple-600',
       bgColor: 'metric-icon-purple',
-      description: 'Client accounts'
+      description: 'GenCs awaiting assignment'
     },
     {
       title: 'Billing Started',

@@ -37,6 +37,7 @@ class AccountServiceLineUpdate(AccountServiceLineBase):
 
 class AccountServiceLine(AccountServiceLineBase):
     id: int
+    account: Optional['Account'] = None
     
     class Config:
         from_attributes = True
@@ -96,6 +97,7 @@ class GenCSkillUpdate(BaseModel):
 
 class GenCSkill(GenCSkillBase):
     id: int
+    skill: Optional['Skill'] = None
     
     class Config:
         from_attributes = True
@@ -144,6 +146,10 @@ class GenCUpdate(GenCBase):
 
 class GenC(GenCBase):
     id: int
+    account: Optional['Account'] = None
+    service_line_obj: Optional['AccountServiceLine'] = None
+    mentor: Optional['Mentor'] = None
+    skills: Optional[List['GenCSkill']] = None
     
     class Config:
         from_attributes = True
@@ -163,6 +169,8 @@ class GenCFeedbackUpdate(GenCFeedbackBase):
 
 class GenCFeedback(GenCFeedbackBase):
     id: int
+    genc: Optional['GenC'] = None
+    mentor: Optional['Mentor'] = None
     
     class Config:
         from_attributes = True
@@ -204,4 +212,10 @@ class RoleRequirementMatrix(BaseModel):
 # Status transition schema
 class StatusTransition(BaseModel):
     from_status: StatusEnum
-    to_status: StatusEnum 
+    to_status: StatusEnum
+
+# Update forward references
+AccountServiceLine.model_rebuild()
+GenCSkill.model_rebuild()
+GenC.model_rebuild()
+GenCFeedback.model_rebuild() 

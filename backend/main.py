@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
@@ -60,6 +60,47 @@ def delete_account(account_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Account not found")
     return {"message": "Account deleted successfully"}
 
+# Test endpoint to verify server restart
+@app.get("/test-import/")
+def test_import_endpoint():
+    return {"message": "Import endpoint is available", "status": "working"}
+
+# Account Import endpoint
+@app.post("/accounts/import/")
+async def import_accounts(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Import accounts from Excel file"""
+    if not file.filename or not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="File must be an Excel file (.xlsx or .xls)")
+    
+    try:
+        result = await crud.import_accounts_from_excel(db, file)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing file: {str(e)}")
+
+# Delete all accounts and related data endpoint
+@app.delete("/accounts/delete-all/")
+def delete_all_accounts(db: Session = Depends(get_db)):
+    """Delete all accounts and their related data (GenCs, Service Lines, Skills, Feedback)"""
+    try:
+        result = crud.delete_all_accounts_and_related_data(db)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error deleting accounts: {str(e)}")
+
+# Mentor Import endpoint
+@app.post("/mentors/import/")
+async def import_mentors(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Import mentors from Excel file"""
+    if not file.filename or not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="File must be an Excel file (.xlsx or .xls)")
+    
+    try:
+        result = await crud.import_mentors_from_excel(db, file)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing file: {str(e)}")
+
 # Account Service Line endpoints
 @app.post("/account-service-lines/", response_model=schemas.AccountServiceLine, status_code=status.HTTP_201_CREATED)
 def create_account_service_line(service_line: schemas.AccountServiceLineCreate, db: Session = Depends(get_db)):
@@ -94,6 +135,19 @@ def delete_account_service_line(service_line_id: int, db: Session = Depends(get_
     if db_service_line is None:
         raise HTTPException(status_code=404, detail="Account Service Line not found")
     return {"message": "Account Service Line deleted successfully"}
+
+# Account Service Line Import endpoint
+@app.post("/account-service-lines/import/")
+async def import_account_service_lines(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Import account service lines from Excel file"""
+    if not file.filename or not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="File must be an Excel file (.xlsx or .xls)")
+    
+    try:
+        result = await crud.import_account_service_lines_from_excel(db, file)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing file: {str(e)}")
 
 # Mentor endpoints
 @app.post("/mentors/", response_model=schemas.Mentor, status_code=status.HTTP_201_CREATED)
@@ -244,10 +298,18 @@ def delete_role_skill_requirement(requirement_id: int, db: Session = Depends(get
 # GenC endpoints (updated without skills field)
 @app.post("/gencs/", response_model=schemas.GenC, status_code=status.HTTP_201_CREATED)
 def create_genc(genc: schemas.GenCCreate, db: Session = Depends(get_db)):
-    db_genc = crud.get_genc_by_associate_id(db, genc.associate_id)
-    if db_genc:
-        raise HTTPException(status_code=400, detail="GenC associate ID already registered")
-    return crud.create_genc(db=db, genc=genc)
+    print(f"Received GenC data: {genc}")  # Debug log
+    try:
+        # Check for duplicate associate ID
+        db_genc = crud.get_genc_by_associate_id(db, genc.associate_id)
+        if db_genc:
+            raise HTTPException(status_code=400, detail="GenC associate ID already registered")
+        
+        # Create the GenC
+        return crud.create_genc(db=db, genc=genc)
+    except Exception as e:
+        print(f"Error creating GenC: {str(e)}")  # Debug log
+        raise HTTPException(status_code=500, detail=f"Error creating GenC: {str(e)}")
 
 @app.get("/gencs/", response_model=List[schemas.GenC])
 def read_gencs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
@@ -277,6 +339,19 @@ def delete_genc(genc_id: int, db: Session = Depends(get_db)):
     if db_genc is None:
         raise HTTPException(status_code=404, detail="GenC not found")
     return {"message": "GenC deleted successfully"}
+
+# GenC Import endpoint
+@app.post("/gencs/import/")
+async def import_gencs(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Import GenCs from Excel file"""
+    if not file.filename or not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="File must be an Excel file (.xlsx or .xls)")
+    
+    try:
+        result = await crud.import_gencs_from_excel(db, file)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing file: {str(e)}")
 
 # GenC Feedback endpoints
 @app.post("/genc-feedbacks/", response_model=schemas.GenCFeedback, status_code=status.HTTP_201_CREATED)

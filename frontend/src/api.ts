@@ -21,7 +21,17 @@ export const accountAPI = {
   getById: (id: number) => api.get<Account>(`/accounts/${id}`),
   create: (data: AccountCreate) => api.post<Account>('/accounts/', data),
   update: (id: number, data: AccountCreate) => api.put<Account>(`/accounts/${id}`, data),
-  delete: (id: number) => api.delete(`/accounts/${id}`)
+  delete: (id: number) => api.delete(`/accounts/${id}`),
+  importExcel: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/accounts/import/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  deleteAll: () => api.delete('/accounts/delete-all/')
 };
 
 // Account Service Line API
@@ -31,7 +41,16 @@ export const accountServiceLineAPI = {
   getByAccount: (accountId: number) => api.get<AccountServiceLine[]>(`/accounts/${accountId}/service-lines/`),
   create: (data: AccountServiceLineCreate) => api.post<AccountServiceLine>('/account-service-lines/', data),
   update: (id: number, data: AccountServiceLineCreate) => api.put<AccountServiceLine>(`/account-service-lines/${id}`, data),
-  delete: (id: number) => api.delete(`/account-service-lines/${id}`)
+  delete: (id: number) => api.delete(`/account-service-lines/${id}`),
+  importExcel: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/account-service-lines/import/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
 };
 
 // Mentor API
@@ -40,7 +59,16 @@ export const mentorAPI = {
   getById: (id: number) => api.get<Mentor>(`/mentors/${id}`),
   create: (data: MentorCreate) => api.post<Mentor>('/mentors/', data),
   update: (id: number, data: MentorCreate) => api.put<Mentor>(`/mentors/${id}`, data),
-  delete: (id: number) => api.delete(`/mentors/${id}`)
+  delete: (id: number) => api.delete(`/mentors/${id}`),
+  importExcel: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/mentors/import/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
 };
 
 // Skill API
@@ -80,7 +108,16 @@ export const genCAPI = {
   getById: (id: number) => api.get<GenC>(`/gencs/${id}`),
   create: (data: GenCCreate) => api.post<GenC>('/gencs/', data),
   update: (id: number, data: GenCCreate) => api.put<GenC>(`/gencs/${id}`, data),
-  delete: (id: number) => api.delete(`/gencs/${id}`)
+  delete: (id: number) => api.delete(`/gencs/${id}`),
+  importExcel: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/gencs/import/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
 };
 
 // GenC Feedback API

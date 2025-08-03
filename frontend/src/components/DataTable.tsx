@@ -6,6 +6,13 @@ interface Column {
   render?: (value: any, item: any) => React.ReactNode;
 }
 
+interface ActionButton {
+  label: string;
+  onClick: () => void;
+  icon?: React.ReactNode;
+  variant?: 'primary' | 'secondary';
+}
+
 interface DataTableProps {
   title: string;
   data: any[];
@@ -14,6 +21,7 @@ interface DataTableProps {
   onNew: () => void;
   onEdit: (item: any) => void;
   onDelete: (item: any) => void;
+  actionButtons?: ActionButton[];
 }
 
 export default function DataTable({ 
@@ -23,7 +31,8 @@ export default function DataTable({
   loading = false, 
   onNew, 
   onEdit, 
-  onDelete 
+  onDelete,
+  actionButtons = []
 }: DataTableProps) {
   return (
     <div>
@@ -33,13 +42,29 @@ export default function DataTable({
             <h1 className="page-title">{title}</h1>
             <p className="page-subtitle">Manage {title.toLowerCase()}</p>
           </div>
-          <button
-            onClick={onNew}
-            className="cognizant-button-primary flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            New
-          </button>
+          <div className="flex gap-3">
+            {actionButtons.map((button, index) => (
+              <button
+                key={index}
+                onClick={button.onClick}
+                className={`${
+                  button.variant === 'secondary' 
+                    ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                    : 'cognizant-button-primary'
+                } flex items-center gap-2`}
+              >
+                {button.icon}
+                {button.label}
+              </button>
+            ))}
+            <button
+              onClick={onNew}
+              className="cognizant-button-primary flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              New
+            </button>
+          </div>
         </div>
       </div>
 
