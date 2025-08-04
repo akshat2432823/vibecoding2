@@ -169,8 +169,7 @@ export default function AccountList() {
     {
       label: 'Import',
       onClick: handleImport,
-      icon: <Upload className="h-4 w-4" />,
-      variant: 'secondary' as const
+      icon: <Upload className="h-4 w-4" />
     },
     {
       label: 'Delete All',

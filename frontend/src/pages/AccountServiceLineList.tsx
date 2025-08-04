@@ -150,8 +150,7 @@ export default function AccountServiceLineList() {
     {
       label: 'Import',
       onClick: handleImport,
-      icon: <Upload className="h-4 w-4" />,
-      variant: 'secondary' as const
+      icon: <Upload className="h-4 w-4" />
     }
   ];
 
